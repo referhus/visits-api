@@ -10,9 +10,11 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+  
+  const port = process.env.PORT || 3000;
 
   app.use(requestIp.mw({ attributeName: 'clientIp' }));
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(port, '0.0.0.0')
 }
 bootstrap();
