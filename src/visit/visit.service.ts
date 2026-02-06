@@ -51,7 +51,7 @@ export class VisitService {
       const total = await this.getVisitsLength();
 
       return {
-        total: total,
+        ...total,
       };
     } catch (e: unknown) {
       return {
