@@ -1,7 +1,10 @@
+export interface Visit {
+  ip: string;
+  date: string;
+}
+
 export interface VisitCounterData {
-  'visit-counter'?: {
-    count: number;
-  }[];
+  visits?: Visit[];
 }
 
 export interface ResponseVisitWithData {

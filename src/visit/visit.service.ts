@@ -1,42 +1,62 @@
 import { FirestoreService } from '../firestore/firestore.service';
-import { Injectable, Req } from '@nestjs/common';
-import { ResponseVisitWithData } from '../types';
+import { Injectable } from '@nestjs/common';
 import { getTodayDate } from '../utils';
 import { Request } from 'express';
+import { ResponseVisitWithData } from '../types';
 
 @Injectable()
 export class VisitService {
   constructor(private readonly firestoreService: FirestoreService) {}
 
-  async getVisitCounter() {
+  private generateVisitId(ip: string = ''): string {
+    const today = getTodayDate();
+    const ipFormatted = ip.replace(/\./g, '_').replace(/:/g, '_');
+    return `${ipFormatted}_${today}`;
+  }
+
+  async getVisits() {
     try {
-      return await this.firestoreService.getData('visit-counter');
-    } catch (e) {
-      return [];
+      return await this.firestoreService.getData('visits');
+    } catch (e: unknown) {
+      return {
+        error: e,
+      };
     }
   }
 
-  async setVisitCounter(req: Request) {
+  async getVisitsLength() {
     try {
-      const clientIp = req.clientIp;
-      const data = await this.getVisitCounter();
-      if (!data) return;
-
-      const oldCount = (data as ResponseVisitWithData).data[
-        'visit-counter'
-      ]?.[0]?.count;
-
-      const newCount = (oldCount || 0) + 1;
-      await this.firestoreService.runTransaction('visit-counter', 'counter', {
-        count: newCount,
-      });
+      const visits = await this.firestoreService.getData('visits');
 
       return {
-        count: newCount,
+        total: (visits as ResponseVisitWithData).data.visits?.length,
       };
-    } catch (e) {
-      console.log(e);
-      return [];
+    } catch (e: unknown) {
+      return {
+        error: e,
+      };
+    }
+  }
+
+  async setVisit(req: Request) {
+    try {
+      const clientIp = req.clientIp;
+      const visitId = this.generateVisitId(clientIp);
+
+      await this.firestoreService.create('visits', visitId, {
+        ip: clientIp,
+        date: getTodayDate(),
+      });
+
+      const total = await this.getVisitsLength();
+
+      return {
+        total: total,
+      };
+    } catch (e: unknown) {
+      return {
+        error: e,
+      };
     }
   }
 }
