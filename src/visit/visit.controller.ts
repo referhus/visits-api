@@ -8,7 +8,7 @@ export class VisitController {
 
   @Get()
   getVisits() {
-    return this.visitService.getVisits();
+    return this.visitService.getVisitsLength();
   }
 
   @Get('visited')
