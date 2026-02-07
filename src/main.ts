@@ -6,15 +6,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://referhus.github.io/', // или ваш Vue URL
+    origin: 'https://referhus.github.io', // или ваш Vue URL
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
-  
+
   const port = process.env.PORT || 3000;
 
   app.use(requestIp.mw({ attributeName: 'clientIp' }));
 
-  await app.listen(port, '0.0.0.0')
+  await app.listen(port, '0.0.0.0');
 }
 bootstrap();
