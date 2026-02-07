@@ -7,11 +7,6 @@ export class VisitController {
   constructor(private readonly visitService: VisitService) {}
 
   @Get()
-  getVisits() {
-    return this.visitService.getVisitsLength();
-  }
-
-  @Get('visited')
   setVisit(@Req() req: Request) {
     return this.visitService.setVisit(req);
   }
