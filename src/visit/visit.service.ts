@@ -1,5 +1,5 @@
 import { FirestoreService } from '../firestore/firestore.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { getTodayDate } from '../utils';
 import { Request } from 'express';
 import { ResponseVisitWithData } from '../types';
@@ -15,27 +15,21 @@ export class VisitService {
   }
 
   async getVisits() {
-    try {
-      return await this.firestoreService.getData('visits');
-    } catch (e: unknown) {
-      return {
-        error: e,
-      };
-    }
+    const visits = await this.firestoreService.getData('visits');
+
+    if (!visits) throw new NotFoundException('Посещения не найдены');
+
+    return visits;
   }
 
   async getVisitsLength() {
-    try {
-      const visits = await this.firestoreService.getData('visits');
+    const visits = await this.firestoreService.getData('visits');
 
-      return {
-        total: (visits as ResponseVisitWithData).data.visits?.length,
-      };
-    } catch (e: unknown) {
-      return {
-        error: e,
-      };
-    }
+    if (!visits) throw new NotFoundException('Посещения не найдены');
+
+    return {
+      total: (visits as ResponseVisitWithData).data.visits?.length,
+    };
   }
 
   async setVisit(req: Request) {
